@@ -123,3 +123,61 @@ def get_overdue_tasks(tasks):
         if not task.get("completed", False) and 
            task.get("due_date", "") < today
     ]
+
+def add_new_task_to_list(tasks, task_title, task_description, task_priority, task_category, task_due_date):
+    new_task = {
+        "id": generate_unique_id(tasks),
+        "title": task_title,
+        "description": task_description,
+        "priority": task_priority,
+        "category": task_category,
+        "due_date": task_due_date.strftime("%Y-%m-%d"),
+        "completed": False,
+        "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    }
+    tasks.append(new_task)
+    save_tasks(tasks)
+    return tasks
+
+def update_task(task, new_fields):
+    task["title"] = new_fields["title"]
+    task["description"] = new_fields["description"]
+    task["priority"] = new_fields["priority"]
+    task["category"] = new_fields["category"]
+    task["due_date"] = new_fields["due_date"].strftime("%Y-%m-%d")
+
+def toggle_task_completion(tasks, task_id):
+    for task in tasks:
+        if task["id"] == task_id:
+            task["completed"] = not task["completed"]
+            break
+    save_tasks(tasks)
+
+def delete_task(tasks, task_id):
+    """
+    Delete a task by its ID.
+    
+    Args:
+        tasks (list): List of task dictionaries
+        task_id (int): ID of the task to delete
+        
+    Returns:
+        list: Updated list of tasks with the specified task removed
+    """
+    tasks[:] = [task for task in tasks if task["id"] != task_id]
+    save_tasks(tasks)
+    return tasks
+
+def reset_tasks(file_path=DEFAULT_TASKS_FILE):
+    """
+    Reset the tasks by creating an empty task list and clearing the JSON file.
+    
+    Args:
+        file_path (str): Path to the JSON file to reset
+        
+    Returns:
+        list: Empty list of tasks
+    """
+    empty_tasks = []
+    save_tasks(empty_tasks, file_path)
+    return empty_tasks

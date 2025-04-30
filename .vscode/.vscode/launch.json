@@ -1,0 +1,11 @@
+{
+    "name": "Debug Pytest",
+    "type": "python",
+    "request": "launch",
+    "module": "pytest",
+    "args": [
+        "-s", 
+        "tests"
+    ],
+    "justMyCode": false
+}
