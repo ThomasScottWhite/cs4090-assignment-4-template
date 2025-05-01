@@ -38,7 +38,7 @@ def mock_streamlit():
         mock_st.reset_mock()
 
 
-def test_developer_tools_buttons(mock_streamlit):
+def test_mock_developer_tools_buttons(mock_streamlit):
     
     with patch('subprocess.run') as mock_subprocess_run:
         mock_streamlit.button.side_effect = [True, False, False, False, False, False]
@@ -61,7 +61,7 @@ def test_developer_tools_buttons(mock_streamlit):
 # These tests are for the buttons in the developer tools section
 # Pretty much boilerplate they shoud probably be moved into one test
 # but I have already spent to much time on this
-def test_developer_tools_coverage_button(mock_streamlit):
+def test_mock_developer_tools_coverage_button(mock_streamlit):
     
     with patch('subprocess.run') as mock_subprocess_run:
         mock_streamlit.button.side_effect = [False, True, False, False, False, False]
@@ -72,7 +72,7 @@ def test_developer_tools_coverage_button(mock_streamlit):
         args, _ = mock_subprocess_run.call_args
         assert args[0] == ["pytest", "--cov=src", "--cov-report=term-missing"]
 
-def test_developer_tools_param_button(mock_streamlit):
+def test_mock_developer_tools_param_button(mock_streamlit):
     with patch('subprocess.run') as mock_subprocess_run:
         mock_streamlit.button.side_effect = [False, False, True, False, False, False] 
 
@@ -80,7 +80,7 @@ def test_developer_tools_param_button(mock_streamlit):
 
         mock_subprocess_run.assert_called_once_with(["pytest", "-k", "test_param"], capture_output=True, text=True)
 
-def test_developer_tools_mock_button(mock_streamlit):
+def test_mock_developer_tools_mock_button(mock_streamlit):
     with patch('subprocess.run') as mock_subprocess_run:
         mock_streamlit.button.side_effect = [False, False, False, True, False, False]
 
@@ -88,7 +88,7 @@ def test_developer_tools_mock_button(mock_streamlit):
 
         mock_subprocess_run.assert_called_once_with(["pytest", "-k", "test_mock"], capture_output=True, text=True)
 
-def test_developer_tools_html_button(mock_streamlit):
+def test_mock_developer_tools_html_button(mock_streamlit):
     with patch('subprocess.run') as mock_subprocess_run:
         mock_streamlit.button.side_effect = [False, False, False, False, True, False]  # 5th button True
 
@@ -96,7 +96,7 @@ def test_developer_tools_html_button(mock_streamlit):
 
         mock_subprocess_run.assert_called_once_with(["pytest", "--html=report.html"])
 
-def test_developer_tools_bdd_button(mock_streamlit):
+def test_mock_developer_tools_bdd_button(mock_streamlit):
     with patch('subprocess.run') as mock_subprocess_run:
         mock_streamlit.button.side_effect = [False, False, False, False, False, True]
 
@@ -109,7 +109,7 @@ def test_developer_tools_bdd_button(mock_streamlit):
         )
 
 # This test if the render_task_display function works
-def test_render_task_display_incomplete(mock_streamlit, sample_tasks):
+def test_mock_render_task_display_incomplete(mock_streamlit, sample_tasks):
     """Test rendering an incomplete task"""
     
     task = sample_tasks[0]
@@ -132,7 +132,7 @@ def test_render_task_display_incomplete(mock_streamlit, sample_tasks):
     col2_mock.button.assert_any_call("Delete", key=f"delete_{task['id']}")
     col2_mock.button.assert_any_call("Edit", key=f"edit_{task['id']}")
 
-def test_render_task_display_completed(mock_streamlit, sample_tasks):    
+def test_mock_render_task_display_completed(mock_streamlit, sample_tasks):    
     task = sample_tasks[1]
     
     col1_mock, col2_mock = MagicMock(), MagicMock()
@@ -152,7 +152,7 @@ from datetime import datetime
 from src.app import add_new_task  # or your relative import
 
 @patch('src.app.add_new_task_to_list')
-def test_add_new_task(mock_add_new_task_to_list, mock_streamlit, sample_tasks):    
+def test_mock_add_new_task(mock_add_new_task_to_list, mock_streamlit, sample_tasks):    
     sidebar_form_mock = MagicMock()
     mock_streamlit.sidebar.form.return_value.__enter__.return_value = sidebar_form_mock
 
@@ -166,7 +166,7 @@ def test_add_new_task(mock_add_new_task_to_list, mock_streamlit, sample_tasks):
 
     mock_streamlit.sidebar.success.assert_called_once_with("Task added successfully!")
 
-def test_reset_all_tasks(mock_streamlit):
+def test_mock_reset_all_tasks(mock_streamlit):
     from src.app import reset_all_tasks
     
     expander_mock = MagicMock()
@@ -182,7 +182,7 @@ def test_reset_all_tasks(mock_streamlit):
         mock_reset_tasks.assert_called_once()
         mock_streamlit.success.assert_called_once_with("All tasks have been deleted!")
 
-def test_filter_tasks_by_category_priority(mock_streamlit, sample_tasks):
+def test_mock_filter_tasks_by_category_priority(mock_streamlit, sample_tasks):
     from src.app import filter_tasks
     
     mock_streamlit.columns.return_value = [MagicMock(), MagicMock()]
@@ -195,7 +195,7 @@ def test_filter_tasks_by_category_priority(mock_streamlit, sample_tasks):
     assert filtered[0]["category"] == "Work"
     assert filtered[0]["priority"] == "High"
 
-def test_render_edit_task_form_save(mock_streamlit, sample_tasks):
+def test_mock_render_edit_task_form_save(mock_streamlit, sample_tasks):
     from src.app import render_edit_task_form
     
     task = sample_tasks[0]
@@ -216,7 +216,7 @@ def test_render_edit_task_form_save(mock_streamlit, sample_tasks):
         mock_save_tasks.assert_called_once()
         mock_streamlit.success.assert_called_once_with("Task updated successfully!")
 
-def test_editing_task_session_state(mock_streamlit):
+def test_mock_editing_task_session_state(mock_streamlit):
     from src.app import start_editing_task, stop_editing_task, is_editing
 
     task_id = 123
@@ -227,7 +227,7 @@ def test_editing_task_session_state(mock_streamlit):
     assert is_editing(task_id) == False
 
 # This just tests if the main funciton works, it was needed for 90% code coverage
-def test_main_runs(mock_streamlit):
+def test_mock_main_runs(mock_streamlit):
     from src.app import main
 
     mock_streamlit.title.return_value = None
