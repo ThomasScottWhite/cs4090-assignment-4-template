@@ -198,7 +198,7 @@ def main():
 
     add_new_task(tasks)
 
-    display_task_progress(tasks)
+    # display_task_progress(tasks)
 
     st.header("Your Tasks")
     filtered_tasks = filter_tasks(tasks)

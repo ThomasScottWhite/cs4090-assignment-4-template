@@ -5,6 +5,8 @@ import json
 import sys
 from datetime import datetime
 from unittest.mock import MagicMock, patch
+from datetime import datetime, timedelta
+from unittest.mock import patch, MagicMock
 
 sys.modules['streamlit'] = MagicMock()
 
@@ -14,7 +16,7 @@ from src.tasks import (
     save_tasks,
     reset_tasks
 )
-from src.app import display_task_progress
+from src.app import display_task_progress, render_task_display
 
 @pytest.fixture
 def temp_task_file():
@@ -28,7 +30,6 @@ def temp_task_file():
     
     yield temp_name
     
-    # Clean up the temporary file
     if os.path.exists(temp_name):
         os.unlink(temp_name)
 
@@ -99,3 +100,38 @@ def test_display_task_progress_metrics():
         mock_subheader.assert_called_once_with("Task Completion Progress")
         
         mock_progress.assert_called_once_with(0.25)
+
+
+def test_late_task_warning():
+    overdue_date = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+    future_date = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
+
+    tasks = [
+        {
+            "id": 1,
+            "title": "Task 1",
+            "description": "Overdue task",
+            "due_date": overdue_date,
+            "priority": "High",
+            "category": "Work",
+            "completed": False
+        },
+        {
+            "id": 2,
+            "title": "Task 2",
+            "description": "Future task",
+            "due_date": future_date,
+            "priority": "Low",
+            "category": "School",
+            "completed": False
+        }
+    ]
+
+    with patch("src.app.st.columns") as mock_columns:
+        mock_col1 = MagicMock()
+        mock_col2 = MagicMock()
+        mock_columns.return_value = [mock_col1, mock_col2]
+
+        render_task_display(tasks[0], tasks)
+
+        mock_col1.warning.assert_called_once_with("This task is overdue!")
